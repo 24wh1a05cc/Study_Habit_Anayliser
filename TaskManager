@@ -1,0 +1,115 @@
+package hass;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.PriorityQueue;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+
+public class TaskManager {
+	 PriorityQueue<Task> taskQueue;
+	    HashMap<String, Double> timeSpent;
+	    JTextArea output;
+
+	    public TaskManager() {
+
+	        setTitle("Time Management & Study Habit Analyzer");
+	        setSize(600, 500);
+	        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+	        // Priority queue — higher number = higher priority
+	        taskQueue = new PriorityQueue<>(
+	                (a, b) -> Integer.compare(b.priority, a.priority)
+	        );
+
+	        timeSpent = new HashMap<>();
+
+	        // UI Components
+	        JPanel panel = new JPanel();
+	        panel.setLayout(new GridLayout(6, 2));
+
+	        JTextField nameField = new JTextField();
+	        JTextField priorityField = new JTextField();
+	        JTextField timeField = new JTextField();
+
+	        JButton addBtn = new JButton("Add Task");
+	        JButton logBtn = new JButton("Log Study Time");
+	        JButton showBtn = new JButton("Show Productivity");
+
+	        output = new JTextArea();
+	        output.setEditable(false);
+
+	        // Add UI elements
+	        panel.add(new JLabel("Task Name:"));
+	        panel.add(nameField);
+
+	        panel.add(new JLabel("Priority (1-10):"));
+	        panel.add(priorityField);
+
+	        panel.add(new JLabel("Estimated Time (hrs):"));
+	        panel.add(timeField);
+
+	        panel.add(addBtn);
+	        panel.add(logBtn);
+	        panel.add(showBtn);
+
+	        add(panel, BorderLayout.NORTH);
+	        add(new JScrollPane(output), BorderLayout.CENTER);
+
+	        // Add Task Button
+	        addBtn.addActionListener(e -> {
+	            try {
+	                Task t = new Task(
+	                        nameField.getText(),
+	                        Integer.parseInt(priorityField.getText()),
+	                        Double.parseDouble(timeField.getText())
+	                );
+	                taskQueue.add(t);
+	                output.append("Task Added: " + t + "\n");
+	            } catch (Exception ex) {
+	                output.append("Invalid Input!\n");
+	            }
+	        });
+
+	        // Log Study Time
+	        logBtn.addActionListener(e -> {
+	            try {
+	                String task = nameField.getText();
+	                double hrs = Double.parseDouble(timeField.getText());
+	                timeSpent.put(task, timeSpent.getOrDefault(task, 0.0) + hrs);
+	                output.append("Logged Time for " + task + "\n");
+	            } catch (Exception ex) {
+	                output.append("Invalid Time Input!\n");
+	            }
+	        });
+
+	        // SHOW — correct sorted priority list
+	        showBtn.addActionListener(e -> {
+
+	            output.append("\n--- Sorted Task Priority Order ---\n");
+
+	            // Copy PQ → list
+	            List<Task> sortedList = new ArrayList<>(taskQueue);
+
+	            // Sort list by priority (highest first)
+	            sortedList.sort(Comparator.comparingInt(t -> -t.priority));
+
+	            // Print sorted tasks
+	            for (Task t : sortedList) {
+	                output.append(t.toString() + "\n");
+	            }
+
+	            // Time Report
+	            output.append("\n--- Time Report ---\n");
+	            for (String key : timeSpent.keySet()) {
+	                output.append(key + ": " + timeSpent.get(key) + " hrs\n");
+	            }
+	        });
+
+	        setVisible(true);
+	    }
+
+}
