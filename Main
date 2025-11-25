@@ -1,0 +1,13 @@
+package hass;
+import javax.swing.SwingUtilities;
+
+public class Study_Habit_Analyzer {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SwingUtilities.invokeLater(() -> new TaskManager());
+
+
+	}
+
+}
